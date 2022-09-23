@@ -1,23 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import PhonebookForm from './PhonebookForm'
 import PhonebookDisplay from './PhonebookDisplay'
 import FilterDisplay from './FilterDisplay'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { id: 1,
-      name: 'Arto Hellas',
-      number: '420-69' },
-    { id: 2,
-      name: 'Pythagoras',
-      number: 'a2+b2=c2'},
-    { id: 3,
-      name: 'Ibrahima Bakayoko',
-      number: 'Pr0d1g4l-50n'}
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('promise fulfilled')
+        setPersons(response.data)
+      })
+  },[])
 
   const handleSubmit = (event) => {
     event.preventDefault()
