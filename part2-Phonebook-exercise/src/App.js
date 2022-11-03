@@ -3,6 +3,7 @@ import axios from 'axios'
 import PhonebookForm from './PhonebookForm'
 import PhonebookDisplay from './PhonebookDisplay'
 import FilterDisplay from './FilterDisplay'
+import phonebook from './services/phonebook'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -11,13 +12,13 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
+    phonebook
+      .getAll()
+      .then(folks => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(folks)
       })
-  },[])
+  },[persons])
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -29,11 +30,33 @@ const App = () => {
       return(alert(`${newName} is already taken` ))
     }
     const newPerson = {
-      id: persons.length + 1,
       name: newName,
       number: newNumber
     }
-    setPersons(persons.concat(newPerson))
+    phonebook
+      .create(newPerson)
+      .then(newbie => {
+        setPersons(persons.concat(newbie))
+      })
+    
+  }
+
+  const handleDelete = (event) => {
+    const toBeRemoved = event.target.value
+    console.log(event.target)
+    const deletee = persons.find(person => 
+      person.id === parseInt(toBeRemoved));
+    console.log(deletee)
+    if(window.confirm(`Do you want to delete ${deletee.name}`))
+      {phonebook
+        .remove(toBeRemoved)
+        .then(response => {
+          setPersons(persons.filter(person => person != deletee))
+        })
+        .catch(error => {
+          console.log(error)
+        })
+      }
   }
 
   const handleNameChange = (event) => {
@@ -65,7 +88,8 @@ const App = () => {
         handleNameChange={handleNameChange} newNumber={newNumber}
         handleNumberChange={handleNumberChange}/>
       <h2>Numbers</h2>
-      <PhonebookDisplay personsList={filteredPersonsList}/>
+      <PhonebookDisplay personsList={filteredPersonsList} 
+      handleDelete={handleDelete}/>
     </div>
   )
 }
