@@ -26,18 +26,28 @@ const App = () => {
     const duplicate = persons.findIndex((person) => {
       return person.name === newName
     });
-    if(duplicate !== -1){
-      return(alert(`${newName} is already taken` ))
-    }
     const newPerson = {
       name: newName,
       number: newNumber
     }
-    phonebook
-      .create(newPerson)
-      .then(newbie => {
-        setPersons(persons.concat(newbie))
-      })
+    if(duplicate !== -1){
+      if(window.confirm(`${newName} is already added to
+        phonebook, replace the old number with a new one?`)){
+      }
+      phonebook
+        .update(persons[duplicate].id,newPerson)
+        .then(updatee => {
+          setPersons(persons.filter(person => person.id != 
+            duplicate).concat(updatee))
+        })
+    } 
+    else {  
+      phonebook
+        .create(newPerson)
+        .then(newbie => {
+          setPersons(persons.concat(newbie))
+        })
+    }
     
   }
 
