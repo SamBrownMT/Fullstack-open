@@ -4,12 +4,14 @@ import PhonebookForm from './PhonebookForm'
 import PhonebookDisplay from './PhonebookDisplay'
 import FilterDisplay from './FilterDisplay'
 import phonebook from './services/phonebook'
+import Notification from './Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [msg,setMsg] = useState('')
 
   useEffect(() => {
     phonebook
@@ -40,6 +42,17 @@ const App = () => {
           setPersons(persons.filter(person => person.id != 
             duplicate).concat(updatee))
         })
+        .catch(error => {
+          setMsg(`Information for ${newName} has already been
+            removed from phonebook`)      
+          setTimeout(() => {
+            setMsg(null)
+          },5000)}
+        )
+      setMsg(`${newName} number changed to ${newNumber}`)
+      setTimeout(() => {
+        setMsg(null)
+      },5000)
     } 
     else {  
       phonebook
@@ -47,6 +60,10 @@ const App = () => {
         .then(newbie => {
           setPersons(persons.concat(newbie))
         })
+      setMsg(`${newName} added to phonebook`)
+      setTimeout(() => {
+        setMsg(null)
+      },5000)
     }
     
   }
@@ -90,6 +107,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={msg} />
       <h2>Phonebook</h2>
       <FilterDisplay filter={filter} 
       handleFilterChange={handleFilterChange} />
